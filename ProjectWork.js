@@ -10,8 +10,22 @@ const rl = readline.createInterface({
 
 rl.question('Enter numbers separated by spaces: ', function(input) {
 
-  let numbers1 = input.trim().split(/\s+/).map(Number); // \s+ means one or more white space characters
-  numbers = numbers1.map(num => num ** 2);
+    let numbers1 = input.trim().split(/\s+/).map(Number); // \s+ means one or more white space characters
+    numbers = numbers1.map(num => num ** 2);
+
+    rl.question('How many numbers between 1 and 1000 would you like to generate? ', (amount) => {
+        function getRandomNumbersList(amount) {
+                const result = [];
+                
+                for (let i = 0; i < amount; i++) {
+                    const randomNum = Math.floor(Math.random() * 1000) + 1;
+                    result.push(randomNum);
+                }
+                
+                return result;
+        }
+        console.log(getRandomNumbersList(amount));
+    }
 
   // asks what the threshold is and then makes it into a variable
     rl.question('What would you like the threshold to be? ', (answer) => {
@@ -28,9 +42,7 @@ rl.question('Enter numbers separated by spaces: ', function(input) {
             }
             return [list_higher, list_lower]
         }
-
         let [final_higher, final_lower] = higher_lower(numbers, threshold)
-
 
 
         console.log(`These are the numbers that are higher than ${threshold}: ${final_higher}`);
