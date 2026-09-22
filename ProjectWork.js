@@ -1,5 +1,6 @@
 let numbers;
 let threshold;
+let operator;
 
 const readline = require('readline');
 
@@ -11,13 +12,28 @@ const rl = readline.createInterface({
 rl.question('Enter numbers separated by spaces: ', function(input) {
 
   let numbers1 = input.trim().split(/\s+/).map(Number); // \s+ means one or more white space characters
-  numbers = numbers1.map(num => num ** 2);
 
-  // asks what the threshold is and then makes it into a variable
+  rl.question('What operator would you like to use (square or sqrt)? ', (operatorInput) => {
+    operator = operatorInput.trim().toLowerCase();
+
+    if (operator === 'square' || operator === 'squared') {
+      numbers = numbers1.map(num => num ** 2);
+    } else if (operator === 'sqrt' || operator === 'square root') {
+      numbers = numbers1.map(num => Math.sqrt(num));
+    } else {
+      console.log('Choose "square" or "sqrt" ');
+      rl.close();
+      return;
+    }
+
+    console.log(`Operator is ${operator}`);
+
     rl.question('What would you like the threshold to be? ', (answer) => {
         
         threshold = Number.parseFloat(answer);
-        console.log(`Threshold is ${threshold}`);
+        const round = number => Number(number.toFixed(3));
+
+        console.log(`Threshold is ${round(threshold)}`);
 
         function higher_lower(list, threshold) {
             let list_higher = []
@@ -33,16 +49,16 @@ rl.question('Enter numbers separated by spaces: ', function(input) {
 
 
 
-        console.log(`These are the numbers that are higher than ${threshold}: ${final_higher}`);
-        console.log(`These are the numbers that are lower than ${threshold}: ${final_lower}`);
+        const formattedHigher = final_higher.map(round);
+        const formattedLower = final_lower.map(round);
 
+        console.log(`These are the numbers that are higher than ${round(threshold)}: ${formattedHigher}`);
+        console.log(`These are the numbers that are lower than ${round(threshold)}: ${formattedLower}`);
+
+        rl.close();
     });
-  
+  });
 });
-
-
-
-
 
 
 
