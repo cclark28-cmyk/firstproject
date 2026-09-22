@@ -1,7 +1,3 @@
-let numbers;
-let threshold;
-let operator;
-
 const readline = require('readline');
 
 const rl = readline.createInterface({
@@ -9,56 +5,77 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.question('Enter numbers separated by spaces: ', function(input) {
+function ask(query) {
+    return new Promise(resolve => rl.question(query, resolve));
+}
 
-  let numbers1 = input.trim().split(/\s+/).map(Number); // \s+ means one or more white space characters
+async function getNumbers() {
+    const input = await ask('Enter numbers separated by spaces: ');
+    return input.trim().split(/\s+/).map(Number); // \s+ means one or more white space characters
+}
 
-  rl.question('What operator would you like to use (square or sqrt)? ', (operatorInput) => {
-    operator = operatorInput.trim().toLowerCase();
+async function getOperator() {
+    const answer = await ask('What operator would you like to use (square or sqrt)? ');
+    return answer.trim().toLowerCase();
+}
 
+function applyOperator(numbers, operator) {
     if (operator === 'square' || operator === 'squared') {
-      numbers = numbers1.map(num => num ** 2);
+        return numbers.map(num => num ** 2);
     } else if (operator === 'sqrt' || operator === 'square root') {
-      numbers = numbers1.map(num => Math.sqrt(num));
-    } else {
-      console.log('Choose "square" or "sqrt" ');
-      rl.close();
-      return;
+        return numbers.map(num => Math.sqrt(num));
     }
+    return null; 
+}
 
+async function getThreshold() {
+    const answer = await ask('What would you like the threshold to be? ');
+    return Number.parseFloat(answer);
+}
+
+function round(number) {
+    return Number(number.toFixed(3));
+}
+
+function higherLower(list, threshold) {
+    const listHigher = [];
+    const listLower = [];
+    for (let i = 0; i < list.length; i++) {
+        list[i] >= threshold ? listHigher.push(list[i]) : listLower.push(list[i]);
+    }
+    return [listHigher, listLower];
+}
+
+function printResults(finalHigher, finalLower, threshold) {
+    const formattedHigher = finalHigher.map(round);
+    const formattedLower = finalLower.map(round);
+
+    console.log(`These are the numbers that are higher than ${round(threshold)}: ${formattedHigher}`);
+    console.log(`These are the numbers that are lower than ${round(threshold)}: ${formattedLower}`);
+}
+
+async function main() {
+    const numbers1 = await getNumbers();
+    const operator = await getOperator();
+
+    const numbers = applyOperator(numbers1, operator);
+    if (numbers === null) {
+        console.log('Choose "square" or "sqrt" ');
+        rl.close();
+        return;
+    }
     console.log(`Operator is ${operator}`);
 
-    rl.question('What would you like the threshold to be? ', (answer) => {
-        
-        threshold = Number.parseFloat(answer);
-        const round = number => Number(number.toFixed(3));
+    const threshold = await getThreshold();
+    console.log(`Threshold is ${round(threshold)}`);
 
-        console.log(`Threshold is ${round(threshold)}`);
+    const [finalHigher, finalLower] = higherLower(numbers, threshold);
+    printResults(finalHigher, finalLower, threshold);
 
-        function higher_lower(list, threshold) {
-            let list_higher = []
-            let list_lower = []
-            let list_length = list.length
-            for (let i=0; i<list_length; i++) {
-                list[i]>= threshold ? list_higher.push(list[i]) : list_lower.push(list[i])
-            }
-            return [list_higher, list_lower]
-        }
+    rl.close();
+}
 
-        let [final_higher, final_lower] = higher_lower(numbers, threshold)
-
-
-
-        const formattedHigher = final_higher.map(round);
-        const formattedLower = final_lower.map(round);
-
-        console.log(`These are the numbers that are higher than ${round(threshold)}: ${formattedHigher}`);
-        console.log(`These are the numbers that are lower than ${round(threshold)}: ${formattedLower}`);
-
-        rl.close();
-    });
-  });
-});
+main();
 
 
 
